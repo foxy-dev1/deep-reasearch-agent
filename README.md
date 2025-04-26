@@ -82,6 +82,10 @@ The application follows a structured workflow:
 
 4. **Report Generation**: The system retrieves relevant content from the vector database and uses Gemini to synthesize a comprehensive research report following academic standards.
 
+
+![Flow Diagram](images/deep_search.drawio.png)
+
+
 ## Project Structure
 
 - `app.py`: Main application file containing the Streamlit interface and workflow
@@ -92,9 +96,9 @@ The application follows a structured workflow:
 
 ## Future Enhancements
 
-- Citation support
-- Export options (PDF, Word, etc.)
-- Custom research templates
-- Interactive report exploration
-- Multi-language support
+- A React based Agent Implementation (Currently its a Flow based Implementation)
+- Memory Support
+- Chat History Implementation
+
+
 
