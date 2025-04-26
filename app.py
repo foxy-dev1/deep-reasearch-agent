@@ -32,6 +32,7 @@ import streamlit as st
 import logging
 
 
+# logging 
 logger = logging.getLogger("runs_logger")
 logger.setLevel(logging.INFO)
 
@@ -48,17 +49,18 @@ if not logger.handlers:
 
 
 
-
+# tavily api key import 
 tavily_api_key = os.getenv("TAVILY_API_KEY")
 
-
+# tavily gemini import 
 gemini_api_key = os.getenv("GOOGLE_API_KEY")
 
 
-
+# Embeddings model to embed the results to store in vector db
 embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004",google_api_key=gemini_api_key)
 
 
+# tavily search initialization
 tavily_search = TavilySearch(max_results=1, api_key=tavily_api_key,topic="general",include_raw_content=True)
 
 
@@ -74,7 +76,7 @@ llm = ChatGoogleGenerativeAI(
 
 
 
-
+# state initilization to store messages 
 class State(TypedDict):
 
     messages: Annotated[list[AnyMessage],operator.add]
@@ -109,6 +111,7 @@ Now generate subtopics and search queries for the topic: "{{topic}}"
 """
 
 
+# agent to create subtopics and its related search queries
 query_generator_agent = create_react_agent(llm,tools=[],prompt=prompt)
 
 
@@ -119,17 +122,11 @@ chromadb.api.client.SharedSystemClient.clear_system_cache()
 
 vector_db = Chroma(collection_name="research_data_2", embedding_function=embeddings)
 
-# logging.basicConfig(filename="newfile.log",
-#                         format='%(asctime)s %(message)s',
-#                         filemode='w')
-
-
-# logger = logging.getLogger()
-# logger.setLevel(logging.DEBUG)  
+ 
 
 
 
-
+# function to add raw content from tavily search to vector db
 def add_to_vectorDB(doc):
     if not doc:
         return False
@@ -173,7 +170,7 @@ def web_search(state:State):
         if subtopics_dict:
             result = subtopics_dict.group(1)
                 
-            result = ast.literal_eval(result)
+            result = ast.literal_eval(result)   # using this as the regex returned a str as outptut
 
             for i,content in enumerate(result['subtopics']):
 
@@ -201,7 +198,7 @@ def web_search(state:State):
                             if raw_content:
                                 raw_content.replace("\n","")
 
-                                docs = Document(page_content=raw_content,metadata=metadata)
+                                docs = Document(page_content=raw_content,metadata=metadata)    # making a Document as it acts as input to add_to_vectorDB function
 
                                 add_to_vectorDB(docs)
 
@@ -328,7 +325,7 @@ The final report should function as a standalone, comprehensive academic resourc
 
 
 
-
+# summarizing the content based on titles stored in state that is being used to retrieve content from vector DB
 def summarize_the_content(state:State):
 
     titles = state['title']
@@ -364,6 +361,7 @@ def summarize_the_content(state:State):
     return state
 
 
+# graph initilization
 
 workflow = StateGraph(State)
 workflow.add_node("query_generator", query_generator_agent)
@@ -382,6 +380,8 @@ graph = workflow.compile()
 
 
 st.title("Deep research")
+
+# taking user input 
 
 user_input = st.text_input("Enter your topic to deep research")
 
