@@ -1,0 +1,10 @@
+langchain-core
+pydantic
+typing-extensions
+langchain-chroma
+langchain-tavily
+langgraph
+langchain-text-splitters
+chromadb
+langchain-google-genai
+streamlit
